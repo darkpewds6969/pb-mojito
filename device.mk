@@ -15,14 +15,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+# Enable virtual A/B OTA
+$(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota.mk)
 
 LOCAL_PATH := device/xiaomi/mojito
 
 # A/B
 AB_OTA_PARTITIONS += \
     boot \
+    dtbo \
+    product \
     system \
-    vendor
+    system_ext \
+    vbmeta \
+    vbmeta_system \
+    vendor \
+    vendor_boot
 
 AB_OTA_POSTINSTALL_CONFIG += \
     RUN_POSTINSTALL_system=true \
@@ -32,6 +40,8 @@ AB_OTA_POSTINSTALL_CONFIG += \
 
 # Boot control HAL
 PRODUCT_PACKAGES += \
+    android.hardware.boot@1.1-impl-qti
+    android.hardware.boot@1.1-impl-qti.recovery
     android.hardware.boot@1.0-impl \
     android.hardware.boot@1.0-service
 
