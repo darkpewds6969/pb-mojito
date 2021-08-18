@@ -1,10 +1,31 @@
 import /init.recovery.qcom_decrypt.rc
 
-on fs
-    wait /dev/block/platform/soc/${ro.boot.bootdevice}
-    symlink /dev/block/platform/soc/${ro.boot.bootdevice} /dev/block/bootdevice
+service vendor.qti.vibrator /system/bin/vendor.qti.hardware.vibrator.service
+    user root
+    group root
+    disabled
+    setenv LD_LIBRARY_PATH /vendor/lib64:/vendor/lib:/system/lib64:/system/lib:/sbin
+    seclabel u:r:recovery:s0
 
-service variant-script /system/bin/variant-script.sh
+service gatekeeper-1-0-qti /sbin/android.hardware.gatekeeper@1.0-service-qti
+    user root
+    group root
+    disabled
+    seclabel u:r:recovery:s0
+
+service sbinqseecomd /sbin/qseecomd
+    user root
+    group root
+    disabled
+    seclabel u:r:recovery:s0
+
+service keymaster-4-0-qti /sbin/android.hardware.keymaster@4.1-service-qti
+    user root
+    group root
+    disabled
+    seclabel u:r:recovery:s0
+
+service variant-script /sbin/variant-script.sh
     user root
     group root
     disabled
@@ -12,5 +33,18 @@ service variant-script /system/bin/variant-script.sh
     seclabel u:r:recovery:s0
 
 on boot
+    chmod 0777 /sbin/unified-script.sh
+    start unified-script
+
+on fs
+    wait /dev/block/platform/soc/${ro.boot.bootdevice}
+    symlink /dev/block/platform/soc/${ro.boot.bootdevice} /dev/block/bootdevice
+
+on post-fs
+    start boot-hal-1-1
+
+on boot
+    start health-hal-2-1
     start variant-script
+    start vendor.qti.vibrator
     setprop sys.usb.config adb
